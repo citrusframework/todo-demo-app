@@ -19,6 +19,7 @@ package com.consol.citrus.samples.todolist.jms;
 import com.consol.citrus.samples.todolist.model.TodoEntry;
 import com.consol.citrus.samples.todolist.service.TodoListService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Component;
  * @author Christoph Deppisch
  */
 @Component
+@Profile("jms")
 public class TodoJmsResource {
 
     @Autowired

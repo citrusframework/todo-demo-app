@@ -17,6 +17,9 @@
 package com.consol.citrus.samples.todolist.jms;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.broker.BrokerFactory;
+import org.apache.activemq.broker.BrokerService;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.annotation.*;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
@@ -30,12 +33,27 @@ import javax.jms.ConnectionFactory;
  */
 @Configuration
 @EnableJms
-@Conditional(JmsEnabledCondition.class)
+@Profile("jms")
 public class JmsApplicationConfig {
 
+    private String brokerUrl = "tcp://localhost:61616";
+
+    @Bean(initMethod = "start")
+    public BrokerService messageBroker() {
+        try {
+            BrokerService messageBroker = BrokerFactory.createBroker("broker:" + brokerUrl);
+            messageBroker.setPersistent(false);
+            messageBroker.setUseJmx(false);
+            return messageBroker;
+        } catch (Exception e) {
+            throw new BeanCreationException("Failed to create embedded message broker", e);
+        }
+    }
+
     @Bean
+    @DependsOn("messageBroker")
     public ConnectionFactory activeMqConnectionFactory() {
-        return new ActiveMQConnectionFactory("tcp://localhost:61616");
+        return new ActiveMQConnectionFactory(brokerUrl);
     }
 
     @Bean

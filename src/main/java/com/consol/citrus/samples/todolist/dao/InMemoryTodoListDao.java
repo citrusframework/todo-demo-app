@@ -17,6 +17,8 @@
 package com.consol.citrus.samples.todolist.dao;
 
 import com.consol.citrus.samples.todolist.model.TodoEntry;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,6 +26,8 @@ import java.util.stream.Collectors;
 /**
  * @author Christoph Deppisch
  */
+@Component
+@Profile("in_memory")
 public class InMemoryTodoListDao implements TodoListDao {
 
     /** In memory storage */

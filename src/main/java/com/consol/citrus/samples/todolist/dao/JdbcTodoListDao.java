@@ -17,7 +17,10 @@
 package com.consol.citrus.samples.todolist.dao;
 
 import com.consol.citrus.samples.todolist.model.TodoEntry;
-import org.apache.commons.dbcp.BasicDataSource;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -26,23 +29,12 @@ import java.util.*;
 /**
  * @author Christoph Deppisch
  */
-public class JdbcTodoListDao implements TodoListDao {
+@Component
+@Profile("jdbc")
+public class JdbcTodoListDao implements TodoListDao, InitializingBean {
 
-    private final DataSource dataSource;
-
-    public JdbcTodoListDao() {
-        dataSource = createDataSource();
-    }
-
-    private DataSource createDataSource() {
-        BasicDataSource dataSource = new BasicDataSource();
-        dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
-        dataSource.setUrl("jdbc:hsqldb:hsql://localhost/testdb");
-        dataSource.setUsername("sa");
-        dataSource.setPassword("");
-
-        return dataSource;
-    }
+    @Autowired
+    private DataSource dataSource;
 
     @Override
     public void save(TodoEntry entry) {
@@ -149,7 +141,7 @@ public class JdbcTodoListDao implements TodoListDao {
             Connection connection = getConnection();
             try {
                 connection.setAutoCommit(true);
-                PreparedStatement statement = connection.prepareStatement("UPDATE todo_entries SET (title, description, done) VALUES (?, ?, ?) WHERE id = ?");
+                PreparedStatement statement = connection.prepareStatement("UPDATE todo_entries SET title=?, description=?, done=? WHERE id = ?");
                 try {
                     statement.setString(1, entry.getTitle());
                     statement.setString(2, entry.getDescription());
@@ -173,5 +165,26 @@ public class JdbcTodoListDao implements TodoListDao {
 
     private DataSource getDataSource() {
         return dataSource;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        try {
+            Connection connection = getConnection();
+            try {
+                connection.setAutoCommit(true);
+                PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS todo_entries (id VARCHAR(50), title VARCHAR(255), description VARCHAR(255), done BOOLEAN)");
+                try {
+                    statement.executeUpdate();
+                } finally {
+                    statement.close();
+                }
+            } finally {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Could not create db tables", e);
+        }
+
     }
 }

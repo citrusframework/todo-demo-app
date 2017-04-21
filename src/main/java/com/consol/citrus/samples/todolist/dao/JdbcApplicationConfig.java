@@ -37,7 +37,11 @@ public class JdbcApplicationConfig {
     public Server database() {
         Server database = new Server();
         try {
-            database.setProperties(HsqlProperties.delimitedArgPairsToProps("server.database.0=file:target/testdb;server.dbname.0=testdb;server.remote_open=true;hsqldb.reconfig_logging=false", "=", ";", null));
+            database.setProperties(HsqlProperties.delimitedArgPairsToProps("server.database.0=file:target/testdb;" +
+                    "server.dbname.0=testdb;" +
+                    "server.remote_open=true;" +
+                    "server.port=18080;" +
+                    "hsqldb.reconfig_logging=false", "=", ";", null));
         } catch (IOException | ServerAcl.AclFormatException e) {
             throw new BeanCreationException("Failed to create embedded database storage", e);
         }
@@ -49,7 +53,7 @@ public class JdbcApplicationConfig {
     public DataSource dataSource() {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
-        dataSource.setUrl("jdbc:hsqldb:hsql://localhost/testdb");
+        dataSource.setUrl("jdbc:hsqldb:hsql://localhost:18080/testdb");
         dataSource.setUsername("sa");
         dataSource.setPassword("");
 

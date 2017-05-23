@@ -15,9 +15,51 @@
     <spring.boot.version>1.5.0.RELEASE</spring.boot.version>
     <activemq.version>5.14.3</activemq.version>
     <slf4j.version>1.7.22</slf4j.version>
+    <skip.gpg>false</skip.gpg>
   </properties>
 
+  <licenses>
+    <license>
+      <name>The Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>manual</distribution>
+    </license>
+  </licenses>
+
+  <scm>
+    <connection>scm:git:https://github.com/citrusframework/todo-demo-app.git</connection>
+    <developerConnection>scm:git:git@github.com:citrusframework/todo-demo-app.git</developerConnection>
+    <url>https://github.com/citrusframework/todo-demo-app</url>
+  </scm>
+
   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>1.6</version>
+          <executions>
+            <execution>
+              <id>sign-artifacts</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>sign</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <useAgent>true</useAgent>
+            <keyname>christoph.deppisch@consol.de</keyname>
+            <skip>${skip.gpg}</skip>
+            <gpgArguments>
+              <arg>--allow-weak-digest-algos</arg>
+            </gpgArguments>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>
@@ -114,6 +156,24 @@
             <version>1.4.01</version>
           </dependency>
         </dependencies>
+      </plugin>
+
+      <plugin>
+        <groupId>io.fabric8</groupId>
+        <artifactId>docker-maven-plugin</artifactId>
+        <version>0.20.1</version>
+        <configuration>
+          <verbose>true</verbose>
+          <images>
+            <image>
+              <alias>todo-demo-app</alias>
+              <name>citrus/todo-demo-app:${project.version}</name>
+              <build>
+                <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
+              </build>
+            </image>
+          </images>
+        </configuration>
       </plugin>
     </plugins>
   </build>
@@ -243,4 +303,30 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <profiles>
+    <!-- Distribution Management -->
+    <profile>
+      <id>release-inhouse</id>
+      <distributionManagement>
+        <repository>
+          <id>consol-nexus</id>
+          <url>http://build-n.int.consol.de/repository/citrus-releases</url>
+        </repository>
+        <snapshotRepository>
+          <id>consol-nexus</id>
+          <url>http://build-n.int.consol.de/repository/citrus-snapshots</url>
+        </snapshotRepository>
+      </distributionManagement>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

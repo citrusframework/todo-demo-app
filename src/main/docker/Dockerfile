@@ -17,8 +17,8 @@ RUN ln -s ${DEPLOY_DIR}/ROOT.war /opt/tomcat/webapps/ROOT.war
 # Use faster (though more unsecure) random number generator
 RUN export CATALINA_OPTS="${CATALINA_OPTS} $(/opt/run-java-options) $(/opt/java-container-options) $(/opt/debug-options) -Djava.security.egd=file:/dev/./urandom"
 
-RUN groupadd -g 1000070000 openshift
-RUN useradd -u 1000070000 -g openshift -G jboss openshift
+RUN groupadd -g 1000080000 openshift
+RUN useradd -u 1000080000 -g openshift -G jboss openshift
 RUN chown -h openshift:jboss /opt/tomcat && chown -R openshift:jboss /opt/apache-tomcat-${TOMCAT_VERSION}
 
 CMD /opt/tomcat/bin/catalina.sh run

@@ -2,7 +2,7 @@ FROM fabric8/tomcat-8
 
 MAINTAINER ConSol Software GmbH <testautomatisierung@consol.de>
 
-ENV TODO_APP_VERSION=1.0.0
+ENV APP_VERSION=1.0.0
 
 ENV CATALINA_OUT=/dev/null
 
@@ -10,7 +10,7 @@ USER root
 
 RUN mkdir ${DEPLOY_DIR} && rm -rf /opt/tomcat/webapps/ROOT
 
-RUN curl http://build-n.int.consol.de/repository/citrus-releases/com/consol/citrus/samples/todo-demo-app/${TODO_APP_VERSION}/todo-demo-app-${TODO_APP_VERSION}.war -o ${DEPLOY_DIR}/ROOT.war
+RUN curl http://build-n.int.consol.de/repository/citrus-releases/com/consol/citrus/samples/todo-demo-app/${APP_VERSION}/todo-demo-app-${APP_VERSION}.war -o ${DEPLOY_DIR}/ROOT.war
 
 RUN ln -s ${DEPLOY_DIR}/ROOT.war /opt/tomcat/webapps/ROOT.war
 

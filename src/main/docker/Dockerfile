@@ -10,7 +10,7 @@ USER root
 
 RUN mkdir ${DEPLOY_DIR} && rm -rf /opt/tomcat/webapps/ROOT
 
-RUN curl http://build-n.int.consol.de/repository/citrus-releases/com/consol/todo-demo-app/${TODO_APP_VERSION}/todo-demo-app-${TODO_APP_VERSION}.war -o ${DEPLOY_DIR}/ROOT.war
+RUN curl http://build-n.int.consol.de/repository/citrus-releases/com/consol/citrus/samples/todo-demo-app/${TODO_APP_VERSION}/todo-demo-app-${TODO_APP_VERSION}.war -o ${DEPLOY_DIR}/ROOT.war
 
 RUN ln -s ${DEPLOY_DIR}/ROOT.war /opt/tomcat/webapps/ROOT.war
 

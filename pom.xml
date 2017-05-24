@@ -15,6 +15,9 @@
     <spring.boot.version>1.5.0.RELEASE</spring.boot.version>
     <activemq.version>5.14.3</activemq.version>
     <slf4j.version>1.7.22</slf4j.version>
+    <openshift.domain>paas.osp.consol.de</openshift.domain>
+    <openshift.namespace>citrus</openshift.namespace>
+    <application.name>todo-demo-app</application.name>
     <skip.gpg>false</skip.gpg>
   </properties>
 
@@ -27,8 +30,8 @@
   </licenses>
 
   <scm>
-    <connection>scm:git:https://github.com/citrusframework/todo-demo-app.git</connection>
-    <developerConnection>scm:git:git@github.com:citrusframework/todo-demo-app.git</developerConnection>
+    <connection>https://github.com/citrusframework/todo-demo-app.git</connection>
+    <developerConnection>git@github.com:citrusframework/todo-demo-app.git</developerConnection>
     <url>https://github.com/citrusframework/todo-demo-app</url>
   </scm>
 

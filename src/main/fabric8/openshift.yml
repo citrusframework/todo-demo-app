@@ -84,7 +84,7 @@ items:
           imagePullPolicy: IfNotPresent
           env:
           - name: SPRING_PROFILES_ACTIVE
-            value: dev
+            value: in_memory
           - name: KUBERNETES_NAMESPACE
             valueFrom:
               fieldRef:

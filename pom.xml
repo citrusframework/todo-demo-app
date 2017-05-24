@@ -202,7 +202,7 @@
                 <namingStrategy>alias</namingStrategy>
                 <env>
                   <CATALINA_OPTS>-Xmx64m</CATALINA_OPTS>
-                  <SPRING_PROFILES_ACTIVE>dev</SPRING_PROFILES_ACTIVE>
+                  <SPRING_PROFILES_ACTIVE>in_memory</SPRING_PROFILES_ACTIVE>
                 </env>
                 <ports>
                   <port>8080:8080</port>

@@ -17,6 +17,7 @@
     <slf4j.version>1.7.22</slf4j.version>
     <openshift.domain>paas.osp.consol.de</openshift.domain>
     <openshift.namespace>citrus</openshift.namespace>
+    <openshift.user>1000080000</openshift.user>
     <application.name>todo-demo-app</application.name>
     <skip.gpg>false</skip.gpg>
   </properties>

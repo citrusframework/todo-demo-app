@@ -5,7 +5,6 @@ MAINTAINER citrusframework.org <citrus-dev-l@consol.de>
 ENV APP_VERSION=1.0.0
 ENV APP_ARTIFACT=todo-demo-app
 ENV DEPLOY_DIR /app
-ENV INST_SCRIPTS /install
 
 EXPOSE 8080
 

@@ -16,25 +16,16 @@
 
 package com.consol.citrus.samples.todolist.jms;
 
-import com.consol.citrus.samples.todolist.model.TodoEntry;
-import com.consol.citrus.samples.todolist.service.TodoListService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Conditional;
-import org.springframework.jms.annotation.JmsListener;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Condition;
+import org.springframework.context.annotation.ConditionContext;
+import org.springframework.core.type.AnnotatedTypeMetadata;
 
 /**
  * @author Christoph Deppisch
  */
-@Component
-@Conditional(JmsEnabledCondition.class)
-public class TodoJmsResource {
-
-    @Autowired
-    private TodoListService todoListService;
-
-    @JmsListener(destination = "jms.todo.inbound", containerFactory = "jmsListenerContainerFactory")
-    public void receiveTodo(TodoEntry todo) {
-        todoListService.addEntry(todo);
+public class JmsEnabledCondition implements Condition {
+    @Override
+    public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+        return Boolean.valueOf(System.getProperty("todo.jms.enabled", "false"));
     }
 }

@@ -11,10 +11,10 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <spring.version>4.3.6.RELEASE</spring.version>
-    <spring.boot.version>1.5.0.RELEASE</spring.boot.version>
-    <activemq.version>5.14.3</activemq.version>
-    <slf4j.version>1.7.22</slf4j.version>
+    <spring.version>4.3.11.RELEASE</spring.version>
+    <spring.boot.version>1.5.7.RELEASE</spring.boot.version>
+    <activemq.version>5.15.1</activemq.version>        
+    <slf4j.version>1.7.25</slf4j.version>
     <openshift.domain>paasint.consol.de</openshift.domain>
     <openshift.namespace>citrus</openshift.namespace>
     <openshift.user>1000080000</openshift.user>
@@ -80,6 +80,7 @@
           <version>${spring.boot.version}</version>
           <configuration>
             <fork>true</fork>
+            <jvmArguments>-Dtodo.persistence.type=jdbc -Dtodo.jms.enabled=true</jvmArguments>
           </configuration>
         </plugin>
       </plugins>
@@ -321,6 +322,12 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-tomcat</artifactId>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
+      <optional>true</optional>
     </dependency>
 
     <dependency>

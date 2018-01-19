@@ -21,6 +21,8 @@ import org.hsqldb.persist.HsqlProperties;
 import org.hsqldb.server.Server;
 import org.hsqldb.server.ServerAcl;
 import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.*;
 
 import javax.sql.DataSource;
@@ -30,10 +32,11 @@ import java.io.IOException;
  * @author Christoph Deppisch
  */
 @Configuration
-@Profile("jdbc")
+@EnableConfigurationProperties(JdbcConfigurationProperties.class)
 public class JdbcApplicationConfig {
 
     @Bean(initMethod = "start", destroyMethod = "stop")
+    @ConditionalOnProperty(prefix = "todo.persistence", value = "server", havingValue = "enabled", matchIfMissing = true)
     public Server database() {
         Server database = new Server();
         try {
@@ -48,14 +51,27 @@ public class JdbcApplicationConfig {
         return database;
     }
 
-    @Bean(destroyMethod = "close")
+    @Bean
+    @ConditionalOnProperty(prefix = "todo.persistence", value = "type", havingValue = "in_memory", matchIfMissing = true)
+    public TodoListDao todoListInMemoryDao() {
+        return new InMemoryTodoListDao();
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "todo.persistence", value = "type", havingValue = "jdbc")
+    public TodoListDao todoListJdbcDao() {
+        return new JdbcTodoListDao();
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "todo.persistence", value = "type", havingValue = "jdbc")
     @DependsOn("database")
-    public DataSource dataSource() {
+    public DataSource dataSource(JdbcConfigurationProperties configurationProperties) {
         BasicDataSource dataSource = new BasicDataSource();
-        dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
-        dataSource.setUrl("jdbc:hsqldb:hsql://localhost:18080/testdb");
-        dataSource.setUsername("sa");
-        dataSource.setPassword("");
+        dataSource.setDriverClassName(configurationProperties.getDriverClassName());
+        dataSource.setUrl(configurationProperties.getUrl());
+        dataSource.setUsername(configurationProperties.getUsername());
+        dataSource.setPassword(configurationProperties.getPassword());
 
         return dataSource;
     }

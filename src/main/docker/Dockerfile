@@ -1,23 +1,26 @@
-FROM maven:3.5.0-jdk-8
+FROM openjdk:8-jdk
 
-MAINTAINER citrusframework.org <citrus-dev-l@consol.de>
+LABEL maintainer="citrusframework.org <citrus-dev-l@consol.de>"
 
-ENV APP_VERSION=1.0.0
-ENV APP_ARTIFACT=todo-demo-app
+ARG APP_VERSION
+ARG APP_ARTIFACT
+
 ENV DEPLOY_DIR /app
 
 EXPOSE 8080
 
 USER root
 
+VOLUME /tmp
+
 RUN mkdir ${DEPLOY_DIR}
 
-RUN curl https://labs.consol.de/maven/repository/com/consol/citrus/samples/${APP_ARTIFACT}/${APP_VERSION}/${APP_ARTIFACT}-${APP_VERSION}-executable.war -o ${DEPLOY_DIR}/${APP_ARTIFACT}.war
+RUN curl https://labs.consol.de/maven/repository/com/consol/citrus/samples/$APP_ARTIFACT/$APP_VERSION/$APP_ARTIFACT-$APP_VERSION-executable.jar -o $DEPLOY_DIR/app.jar
 
-RUN find $DEPLOY_DIR -name '*.war' -exec chmod a+x {} +
+RUN find $DEPLOY_DIR -name '*.jar' -exec chmod a+x {} +
 
 RUN useradd -U citrus
 
-CMD java -jar ${DEPLOY_DIR}/${APP_ARTIFACT}.war
+CMD java -Djava.security.egd=file:/dev/./urandom -jar ${DEPLOY_DIR}/app.jar
 
 USER citrus

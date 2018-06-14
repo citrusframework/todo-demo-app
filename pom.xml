@@ -19,6 +19,7 @@
     <openshift.user>1000080000</openshift.user>
     <application.name>todo-demo-app</application.name>
     <skip.gpg>false</skip.gpg>
+    <skipJaxb>true</skipJaxb>
   </properties>
 
   <licenses>
@@ -147,6 +148,7 @@
           <xjbSources>
             <xjbSource>src/main/resources/schema/binding.xjb</xjbSource>
           </xjbSources>
+          <skipXjc>${skipJaxb}</skipXjc>
         </configuration>
         <dependencies>
           <dependency>
@@ -174,6 +176,10 @@
               <name>citrusframework/todo-demo-app:${project.version}</name>
               <build>
                 <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
+                <args>
+                  <APP_VERSION>${project.version}</APP_VERSION>
+                  <APP_ARTIFACT>${project.artifactId}</APP_ARTIFACT>
+                </args>
               </build>
               <run>
                 <namingStrategy>alias</namingStrategy>

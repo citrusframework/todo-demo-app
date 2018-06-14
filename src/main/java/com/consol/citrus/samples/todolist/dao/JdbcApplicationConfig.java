@@ -25,7 +25,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.*;
 
-import javax.sql.DataSource;
 import java.io.IOException;
 
 /**
@@ -40,11 +39,14 @@ public class JdbcApplicationConfig {
     public Server database() {
         Server database = new Server();
         try {
-            database.setProperties(HsqlProperties.delimitedArgPairsToProps("server.database.0=file:target/testdb;" +
-                    "server.dbname.0=testdb;" +
-                    "server.remote_open=true;" +
-                    "server.port=18080;" +
-                    "hsqldb.reconfig_logging=false", "=", ";", null));
+            HsqlProperties properties = new HsqlProperties();
+            properties.setProperty("server.port", "9099");
+            properties.setProperty("server.database.0", "file:target/testdb");
+            properties.setProperty("server.dbname.0", "testdb");
+            properties.setProperty("server.remote_open", true);
+            properties.setProperty("hsqldb.reconfig_logging", false);
+
+            database.setProperties(properties);
         } catch (IOException | ServerAcl.AclFormatException e) {
             throw new BeanCreationException("Failed to create embedded database storage", e);
         }
@@ -63,10 +65,10 @@ public class JdbcApplicationConfig {
         return new JdbcTodoListDao();
     }
 
-    @Bean
+    @Bean(destroyMethod = "close")
     @ConditionalOnProperty(prefix = "todo.persistence", value = "type", havingValue = "jdbc")
     @DependsOn("database")
-    public DataSource dataSource(JdbcConfigurationProperties configurationProperties) {
+    public BasicDataSource dataSource(JdbcConfigurationProperties configurationProperties) {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName(configurationProperties.getDriverClassName());
         dataSource.setUrl(configurationProperties.getUrl());

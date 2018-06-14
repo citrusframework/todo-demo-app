@@ -36,7 +36,12 @@ public class InMemoryTodoListDao implements TodoListDao {
 
     @Override
     public List<TodoEntry> list() {
-        return storage.stream().collect(Collectors.toList());
+        return Collections.unmodifiableList(storage);
+    }
+
+    @Override
+    public List<TodoEntry> list(int limit) {
+        return storage.stream().limit(limit).collect(Collectors.toList());
     }
 
     @Override

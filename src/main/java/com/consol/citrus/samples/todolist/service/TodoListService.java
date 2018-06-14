@@ -41,6 +41,10 @@ public class TodoListService {
         return todoListDao.list();
     }
 
+    public List<TodoEntry> getAllEntries(int limit) {
+        return todoListDao.list(limit);
+    }
+
     public void clear() {
         todoListDao.deleteAll();
     }

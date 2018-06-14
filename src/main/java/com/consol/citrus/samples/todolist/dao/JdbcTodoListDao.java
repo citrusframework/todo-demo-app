@@ -27,6 +27,7 @@ import java.util.*;
 /**
  * @author Christoph Deppisch
  */
+@SuppressWarnings({"SqlNoDataSourceInspection", "SqlDialectInspection"})
 public class JdbcTodoListDao implements TodoListDao, InitializingBean {
 
     @Autowired
@@ -35,21 +36,15 @@ public class JdbcTodoListDao implements TodoListDao, InitializingBean {
     @Override
     public void save(TodoEntry entry) {
         try {
-            Connection connection = getConnection();
-            try {
+            try (Connection connection = getConnection()) {
                 connection.setAutoCommit(true);
-                PreparedStatement statement = connection.prepareStatement("INSERT INTO todo_entries (id, title, description, done) VALUES (?, ?, ?, ?)");
-                try {
+                try (PreparedStatement statement = connection.prepareStatement("INSERT INTO todo_entries (id, title, description, done) VALUES (?, ?, ?, ?)")) {
                     statement.setString(1, getNextId());
                     statement.setString(2, entry.getTitle());
                     statement.setString(3, entry.getDescription());
                     statement.setBoolean(4, entry.isDone());
                     statement.executeUpdate();
-                } finally {
-                    statement.close();
                 }
-            } finally {
-                connection.close();
             }
         } catch (SQLException e) {
             throw new DataAccessException("Could not save entry " + entry, e);
@@ -63,28 +58,12 @@ public class JdbcTodoListDao implements TodoListDao, InitializingBean {
     @Override
     public List<TodoEntry> list() {
         try {
-            Connection connection = getConnection();
-            try {
-                Statement statement = connection.createStatement();
-                try {
-                    ResultSet resultSet = statement.executeQuery("SELECT id, title, description FROM todo_entries");
-                    try {
-                        List<TodoEntry> list = new ArrayList<>();
-                        while (resultSet.next()) {
-                            String id = resultSet.getString(1);
-                            String title = resultSet.getString(2);
-                            String description = resultSet.getString(3);
-                            list.add(new TodoEntry(UUID.fromString(id), title, description));
-                        }
-                        return list;
-                    } finally {
-                        resultSet.close();
+            try (Connection connection = getConnection()) {
+                try (Statement statement = connection.createStatement()) {
+                    try (ResultSet resultSet = statement.executeQuery("SELECT id, title, description FROM todo_entries")) {
+                        return convertToTodoEntry(resultSet);
                     }
-                } finally {
-                    statement.close();
                 }
-            } finally {
-                connection.close();
             }
         } catch (SQLException e) {
             throw new DataAccessException("Could not list entries", e);
@@ -92,20 +71,40 @@ public class JdbcTodoListDao implements TodoListDao, InitializingBean {
     }
 
     @Override
+    public List<TodoEntry> list(int limit) {
+        try (Connection connection = getConnection()) {
+            try(CallableStatement callableStatement = connection.prepareCall("{CALL limitedToDoList(?)}")){
+                callableStatement.setInt(1, limit);
+                callableStatement.execute();
+                try(ResultSet resultSet = callableStatement.getResultSet()){
+                    return convertToTodoEntry(resultSet);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Could not list entries with limit", e);
+        }
+    }
+
+    private List<TodoEntry> convertToTodoEntry(ResultSet resultSet) throws SQLException {
+        List<TodoEntry> list = new ArrayList<>();
+        while (resultSet.next()) {
+            final String id = resultSet.getString(1);
+            final String title = resultSet.getString(2);
+            final String description = resultSet.getString(3);
+            list.add(new TodoEntry(UUID.fromString(id), title, description));
+        }
+        return list;
+    }
+
+    @Override
     public void delete(TodoEntry entry) {
         try {
-            Connection connection = getConnection();
-            try {
+            try (Connection connection = getConnection()) {
                 connection.setAutoCommit(true);
-                PreparedStatement statement = connection.prepareStatement("DELETE FROM todo_entries WHERE id = ?");
-                try {
+                try (PreparedStatement statement = connection.prepareStatement("DELETE FROM todo_entries WHERE id = ?")) {
                     statement.setString(1, entry.getId().toString());
                     statement.executeUpdate();
-                } finally {
-                    statement.close();
                 }
-            } finally {
-                connection.close();
             }
         } catch (SQLException e) {
             throw new DataAccessException("Could not delete entries for title " + entry.getId().toString(), e);
@@ -115,16 +114,10 @@ public class JdbcTodoListDao implements TodoListDao, InitializingBean {
     @Override
     public void deleteAll() {
         try {
-            Connection connection = getConnection();
-            try {
-                Statement statement = connection.createStatement();
-                try {
+            try (Connection connection = getConnection()) {
+                try (Statement statement = connection.createStatement()) {
                     statement.executeQuery("DELETE FROM todo_entries");
-                } finally {
-                    statement.close();
                 }
-            } finally {
-                connection.close();
             }
         } catch (SQLException e) {
             throw new DataAccessException("Could not delete entries", e);
@@ -134,28 +127,22 @@ public class JdbcTodoListDao implements TodoListDao, InitializingBean {
     @Override
     public void update(TodoEntry entry) {
         try {
-            Connection connection = getConnection();
-            try {
+            try (Connection connection = getConnection()) {
                 connection.setAutoCommit(true);
-                PreparedStatement statement = connection.prepareStatement("UPDATE todo_entries SET title=?, description=?, done=? WHERE id = ?");
-                try {
+                try (PreparedStatement statement = connection.prepareStatement("UPDATE todo_entries SET (title, description, done) VALUES (?, ?, ?) WHERE id = ?")) {
                     statement.setString(1, entry.getTitle());
                     statement.setString(2, entry.getDescription());
                     statement.setBoolean(3, entry.isDone());
                     statement.setString(4, entry.getId().toString());
                     statement.executeUpdate();
-                } finally {
-                    statement.close();
                 }
-            } finally {
-                connection.close();
             }
         } catch (SQLException e) {
             throw new DataAccessException("Could not update entry " + entry, e);
         }
     }
 
-    public Connection getConnection() throws SQLException {
+    private Connection getConnection() throws SQLException {
         return getDataSource().getConnection();
     }
 

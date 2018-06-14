@@ -21,6 +21,7 @@ import com.consol.citrus.samples.todolist.service.TodoListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.jms.annotation.JmsListener;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,4 +38,12 @@ public class TodoJmsResource {
     public void receiveTodo(TodoEntry todo) {
         todoListService.addEntry(todo);
     }
+
+    @JmsListener(destination = "jms.todo.inbound.sync", containerFactory = "jmsListenerContainerFactory")
+    @SendTo("jms.todo.inbound.sync.reply")
+    public String receiveSynchronousTodo(TodoEntry todo) {
+        receiveTodo(todo);
+        return "Message received";
+    }
+
 }

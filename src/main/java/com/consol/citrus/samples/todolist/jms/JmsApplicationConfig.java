@@ -24,6 +24,7 @@ import org.springframework.context.annotation.*;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.converter.*;
 
 import javax.jms.ConnectionFactory;
@@ -38,7 +39,7 @@ public class JmsApplicationConfig {
 
     private String brokerUrl = "tcp://localhost:61616";
 
-    @Bean(initMethod = "start")
+    @Bean(initMethod = "start", destroyMethod = "stop")
     public BrokerService messageBroker() {
         try {
             BrokerService messageBroker = BrokerFactory.createBroker("broker:" + brokerUrl);
@@ -54,6 +55,14 @@ public class JmsApplicationConfig {
     @DependsOn("messageBroker")
     public ConnectionFactory activeMqConnectionFactory() {
         return new ActiveMQConnectionFactory(brokerUrl);
+    }
+
+    @Bean
+    public JmsTemplate jmsTemplate() {
+        JmsTemplate jmsTemplate = new JmsTemplate();
+        jmsTemplate.setConnectionFactory(activeMqConnectionFactory());
+        jmsTemplate.setMessageConverter(jacksonJmsMessageConverter());
+        return jmsTemplate;
     }
 
     @Bean

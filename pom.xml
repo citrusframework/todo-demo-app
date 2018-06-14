@@ -4,16 +4,15 @@
 
   <groupId>com.consol.citrus.samples</groupId>
   <artifactId>todo-demo-app</artifactId>
-  <name>todo-demo-app</name>
-  <version>1.0.0</version>
-  <packaging>war</packaging>
+  <name>Citrus Demo:: Todo App</name>
+  <version>1.1.0</version>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <spring.version>4.3.11.RELEASE</spring.version>
-    <spring.boot.version>1.5.7.RELEASE</spring.boot.version>
-    <activemq.version>5.15.1</activemq.version>        
+    <spring.version>4.3.14.RELEASE</spring.version>
+    <spring.boot.version>1.5.10.RELEASE</spring.boot.version>
+    <activemq.version>5.15.2</activemq.version>
     <slf4j.version>1.7.25</slf4j.version>
     <openshift.domain>paasint.consol.de</openshift.domain>
     <openshift.namespace>citrus</openshift.namespace>
@@ -49,51 +48,17 @@
       </resource>
     </resources>
     
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-gpg-plugin</artifactId>
-          <version>1.6</version>
-          <executions>
-            <execution>
-              <id>sign-artifacts</id>
-              <phase>verify</phase>
-              <goals>
-                <goal>sign</goal>
-              </goals>
-            </execution>
-          </executions>
-          <configuration>
-            <useAgent>true</useAgent>
-            <keyname>christoph.deppisch@consol.de</keyname>
-            <skip>${skip.gpg}</skip>
-            <gpgArguments>
-              <arg>--allow-weak-digest-algos</arg>
-            </gpgArguments>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-maven-plugin</artifactId>
-          <version>${spring.boot.version}</version>
-          <configuration>
-            <fork>true</fork>
-            <jvmArguments>-Dtodo.persistence.type=jdbc -Dtodo.jms.enabled=true</jvmArguments>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>${spring.boot.version}</version>
+        <configuration>
+          <fork>true</fork>
+          <jvmArguments>-Dtodo.persistence.type=jdbc -Dtodo.jms.enabled=true</jvmArguments>
+        </configuration>
         <executions>
           <execution>
-            <id>create-executable-war</id>
-            <phase>package</phase>
             <goals>
               <goal>repackage</goal>
             </goals>
@@ -103,30 +68,16 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.5.1</version>
+        <version>3.7.0</version>
         <configuration>
           <encoding>${project.build.sourceEncoding}</encoding>
           <source>1.8</source>
           <target>1.8</target>
         </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>3.0.1</version>
-        <executions>
-          <execution>
-            <id>copy-tutorials</id>
-            <goals>
-              <goal>resources</goal>
-            </goals>
-            <phase>process-resources</phase>
-          </execution>
-        </executions>
       </plugin>
 
       <plugin>
@@ -142,30 +93,34 @@
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-war-plugin</artifactId>
-        <version>3.0.0</version>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.20.1</version>
         <configuration>
-          <failOnMissingWebXml>false</failOnMissingWebXml>
+          <failIfNoTests>false</failIfNoTests>
+          <workingDirectory>${project.build.directory}</workingDirectory>
         </configuration>
       </plugin>
 
       <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.19.1</version>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.6</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
         <configuration>
-          <systemProperties>
-            <property>
-              <name>javax.xml.parsers.SAXParserFactory</name>
-              <value>org.apache.xerces.jaxp.SAXParserFactoryImpl</value>
-            </property>
-            <property>
-              <name>user.language</name>
-              <value>en</value>
-            </property>
-          </systemProperties>
-          <forkMode>once</forkMode>
-          <failIfNoTests>false</failIfNoTests>
-          <workingDirectory>${project.build.directory}</workingDirectory>
+          <useAgent>true</useAgent>
+          <keyname>christoph.deppisch@consol.de</keyname>
+          <skip>${skip.gpg}</skip>
+          <gpgArguments>
+            <arg>--allow-weak-digest-algos</arg>
+          </gpgArguments>
         </configuration>
       </plugin>
 
@@ -210,13 +165,13 @@
       <plugin>
         <groupId>io.fabric8</groupId>
         <artifactId>docker-maven-plugin</artifactId>
-        <version>0.20.1</version>
+        <version>0.26.0</version>
         <configuration>
           <verbose>true</verbose>
           <images>
             <image>
               <alias>todo-demo-app</alias>
-              <name>citrus/todo-demo-app:${project.version}</name>
+              <name>citrusframework/todo-demo-app:${project.version}</name>
               <build>
                 <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
               </build>
@@ -251,7 +206,7 @@
       <plugin>
         <groupId>io.fabric8</groupId>
         <artifactId>fabric8-maven-plugin</artifactId>
-        <version>3.3.5</version>
+        <version>3.5.31</version>
         <configuration>
           <mode>openshift</mode>
           <verbose>true</verbose>
@@ -314,14 +269,10 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-mustache</artifactId>
     </dependency>
+
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-validation</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-tomcat</artifactId>
-      <scope>provided</scope>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
     </dependency>
 
     <dependency>
@@ -346,6 +297,16 @@
       <version>${spring.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.apache.geronimo.specs</groupId>
+      <artifactId>geronimo-jms_1.1_spec</artifactId>
+      <version>1.1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>activemq-client</artifactId>
+      <version>${activemq.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.activemq</groupId>
       <artifactId>activemq-broker</artifactId>
       <version>${activemq.version}</version>
@@ -366,6 +327,17 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger2</artifactId>
+      <version>2.5.0</version>
+    </dependency>
+    <dependency>
+      <groupId>io.swagger</groupId>
+      <artifactId>swagger-core</artifactId>
+      <version>1.5.16</version>
     </dependency>
 
     <dependency>
@@ -399,7 +371,7 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.1.9</version>
+      <version>1.2.3</version>
     </dependency>
     <dependency>
       <groupId>commons-logging</groupId>

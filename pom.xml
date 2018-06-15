@@ -185,10 +185,12 @@
                 <namingStrategy>alias</namingStrategy>
                 <env>
                   <CATALINA_OPTS>-Xmx64m</CATALINA_OPTS>
-                  <SPRING_PROFILES_ACTIVE>in_memory</SPRING_PROFILES_ACTIVE>
+                  <TODO_PERSISTENCE_TYPE>in_memory</TODO_PERSISTENCE_TYPE>
+                  <TODO_JMS_ENABLED>false</TODO_JMS_ENABLED>
                 </env>
                 <ports>
                   <port>8080:8080</port>
+                  <port>61616:61616</port>
                 </ports>
                 <wait>
                   <http>

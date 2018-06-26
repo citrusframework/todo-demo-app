@@ -33,6 +33,9 @@ public class JdbcTodoListDao implements TodoListDao, InitializingBean {
     @Autowired
     private DataSource dataSource;
 
+    @Autowired
+    private JdbcConfigurationProperties jdbcConfigurationProperties;
+
     @Override
     public void save(TodoEntry entry) {
         try {
@@ -152,22 +155,17 @@ public class JdbcTodoListDao implements TodoListDao, InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        try {
-            Connection connection = getConnection();
+        if (jdbcConfigurationProperties.isAutoCreateTables()) {
             try {
-                connection.setAutoCommit(true);
-                PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS todo_entries (id VARCHAR(50), title VARCHAR(255), description VARCHAR(255), done BOOLEAN)");
-                try {
-                    statement.executeUpdate();
-                } finally {
-                    statement.close();
+                try (Connection connection = getConnection()) {
+                    connection.setAutoCommit(true);
+                    try (PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS todo_entries (id VARCHAR(50), title VARCHAR(255), description VARCHAR(255), done BOOLEAN)")) {
+                        statement.executeUpdate();
+                    }
                 }
-            } finally {
-                connection.close();
+            } catch (SQLException e) {
+                throw new DataAccessException("Could not create db tables", e);
             }
-        } catch (SQLException e) {
-            throw new DataAccessException("Could not create db tables", e);
         }
-
     }
 }

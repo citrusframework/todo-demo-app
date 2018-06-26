@@ -18,6 +18,7 @@ package com.consol.citrus.samples.todolist.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.mail.*;
@@ -35,7 +36,10 @@ public class MailService {
     /** Logger */
     private static Logger log = LoggerFactory.getLogger(MailService.class);
 
+    @Value("${MAIL_PORT_2222_TCP_ADDR:localhost}")
     private String mailServerHost = "localhost";
+
+    @Value("${MAIL_PORT_2222_TCP_PORT:2222}")
     private String mailServerPort = "2222";
 
     private String from = "todo-report@example.org";

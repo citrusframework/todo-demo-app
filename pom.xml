@@ -5,7 +5,7 @@
   <groupId>com.consol.citrus.samples</groupId>
   <artifactId>todo-demo-app</artifactId>
   <name>Citrus Demo:: Todo App</name>
-  <version>1.1.0</version>
+  <version>1.2.0</version>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -185,11 +185,12 @@
                 <namingStrategy>alias</namingStrategy>
                 <env>
                   <CATALINA_OPTS>-Xmx64m</CATALINA_OPTS>
-                  <TODO_PERSISTENCE_TYPE>in_memory</TODO_PERSISTENCE_TYPE>
-                  <TODO_JMS_ENABLED>false</TODO_JMS_ENABLED>
+                  <TODO_PERSISTENCE_TYPE>jdbc</TODO_PERSISTENCE_TYPE>
+                  <TODO_JMS_ENABLED>true</TODO_JMS_ENABLED>
                 </env>
                 <ports>
                   <port>8080:8080</port>
+                  <port>9099:9099</port>
                   <port>61616:61616</port>
                 </ports>
                 <wait>
@@ -357,6 +358,12 @@
       <groupId>commons-dbcp</groupId>
       <artifactId>commons-dbcp</artifactId>
       <version>1.4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.consol.citrus</groupId>
+      <artifactId>citrus-db-driver</artifactId>
+      <version>0.1.4</version>
     </dependency>
 
     <dependency>

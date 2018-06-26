@@ -20,6 +20,8 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.*;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
@@ -34,15 +36,20 @@ import javax.jms.ConnectionFactory;
  */
 @Configuration
 @EnableJms
-@Conditional(JmsEnabledCondition.class)
+@ConditionalOnProperty(prefix = "todo.jms", value = "enabled")
 public class JmsApplicationConfig {
 
-    private String brokerUrl = "tcp://localhost:61616";
+    @Value("${ACTIVEMQ_PORT_61616_TCP_ADDR:localhost}")
+    private String brokerHost = "localhost";
+
+    @Value("${ACTIVEMQ_PORT_61616_TCP_PORT:61616}")
+    private String brokerPort = "61616";
 
     @Bean(initMethod = "start", destroyMethod = "stop")
+    @ConditionalOnProperty(prefix = "todo.jms", value = "broker", havingValue = "enabled", matchIfMissing = true)
     public BrokerService messageBroker() {
         try {
-            BrokerService messageBroker = BrokerFactory.createBroker("broker:" + brokerUrl);
+            BrokerService messageBroker = BrokerFactory.createBroker(String.format("broker:tcp://%s:%s", brokerHost, brokerPort));
             messageBroker.setPersistent(false);
             messageBroker.setUseJmx(false);
             return messageBroker;
@@ -51,10 +58,16 @@ public class JmsApplicationConfig {
         }
     }
 
+    @Bean(name = "messageBroker")
+    @ConditionalOnProperty(prefix = "todo.jms", value = "broker", havingValue = "disabled")
+    public String messageBrokerDisabled() {
+        return "todo.jms.broker.disabled";
+    }
+
     @Bean
     @DependsOn("messageBroker")
     public ConnectionFactory activeMqConnectionFactory() {
-        return new ActiveMQConnectionFactory(brokerUrl);
+        return new ActiveMQConnectionFactory(String.format("tcp://%s:%s", brokerHost, brokerPort));
     }
 
     @Bean

@@ -18,7 +18,7 @@
     <openshift.namespace>citrus</openshift.namespace>
     <openshift.user>1000080000</openshift.user>
     <application.name>todo-demo-app</application.name>
-    <skip.gpg>false</skip.gpg>
+    <skip.gpg>true</skip.gpg>
     <skipJaxb>true</skipJaxb>
   </properties>
 

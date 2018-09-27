@@ -12,6 +12,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <spring.version>4.3.14.RELEASE</spring.version>
     <spring.boot.version>1.5.10.RELEASE</spring.boot.version>
+    <spring.kafka.version>2.1.10.RELEASE</spring.kafka.version>
     <activemq.version>5.15.2</activemq.version>
     <slf4j.version>1.7.25</slf4j.version>
     <openshift.domain>paasint.consol.de</openshift.domain>
@@ -282,6 +283,12 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.kafka</groupId>
+      <artifactId>spring-kafka</artifactId>
+      <version>${spring.kafka.version}</version>
     </dependency>
 
     <dependency>
